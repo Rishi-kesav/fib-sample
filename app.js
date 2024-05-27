@@ -24,26 +24,29 @@ async function postToFarcaster(message) {
     }
 }
 
+// Route to start the game
 app.post('/start_game', async (req, res) => {
     const sentence = "The quick brown ____ jumps over the lazy ____.";
-    await postToFarcaster(`Fill in the blanks: ${sentence}`);
-    res.json({ "status": "Game started", "sentence": sentence });
+    const farcasterResponse = await postToFarcaster(`Fill in the blanks: ${sentence}`);
+    res.json({ status: "Game started", sentence: sentence, farcasterResponse });
 });
 
+// Route to submit an answer
 app.post('/submit_answer', async (req, res) => {
     const userInput = req.body.answer;
     const correctAnswers = ["fox", "dog"];  // Example correct answers
     const userAnswers = userInput.split(' ');
-    
+
     let responseMessage = "Try again!";
     if (userAnswers.length === correctAnswers.length && userAnswers.every((answer, index) => answer.toLowerCase() === correctAnswers[index])) {
         responseMessage = "Congratulations! Your answer is correct.";
     }
 
-    await postToFarcaster(responseMessage);
-    res.json({ "status": "Answer submitted", "response": responseMessage });
+    const farcasterResponse = await postToFarcaster(responseMessage);
+    res.json({ status: "Answer submitted", response: responseMessage, farcasterResponse });
 });
 
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
